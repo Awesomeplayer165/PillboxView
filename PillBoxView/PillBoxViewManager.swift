@@ -13,6 +13,7 @@ class PillBoxViewManager {
     private let height = 45
     private var activityIndicator = UIActivityIndicatorView()
     private var titleLabel = UILabel()
+    public var isAwaitingTaskCompletion = false
     
     public var didFinishTask: Bool? {
         willSet {
@@ -42,6 +43,8 @@ class PillBoxViewManager {
                     imageView.removeFromSuperview()
                     titleLabel.removeFromSuperview()
                 }
+                
+                isAwaitingTaskCompletion = false
             }
         }
     }
@@ -93,5 +96,7 @@ class PillBoxViewManager {
         }
         
         vcView.addSubview(pillView)
+        
+        isAwaitingTaskCompletion = true
     }
 }
