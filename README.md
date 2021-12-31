@@ -1,54 +1,45 @@
-# Template
+# Pillbox View
 
-Small Summary about the repository and its purpose
+Pillbox View shows a small bubble, pill looking box that sides from the top of the screen. You have seen this throughout iOS when the ringer state is changed and Airpods are connected, among others.
 
-## About:
+## Features
 
-Go into more detail about the repository and its purpose
+- Display a title message
+- Show an activity indicator to show ongoing activity
+  - Indicate your task's success with a green checkmark or failure with a red x
 
-## Features:
+## Installation
 
-### Integer From String 
+Copy the `PillBoxViewManager` into your file project/manager. Because I have not opened up to Cocoapods, you will have to be your own dependency manager and check for frequent updates while I am setting up dependency managers.
 
-If a variable read from the console is an integer, then return true:
-
-```swift
-
-func checkIfStringContainsInteger(with string: String) -> Bool {
-  if let string = Int(string) {
-    return true
-  }
-  
-  return false
-}
-
-if let readLine = readLine() {
-  print(checkIfStringContainsInteger(with: readLine))
-}
-
-```
-
-But we can improve this code by extending String to get `self` as the String type presented
+## Quick Start
 
 ```swift
+import UIKit
 
-extension String {
-  func checkIfStringContainsInteger() -> Bool {
-    if let self = Int(self) { return true }
+class ViewController: UIViewController {
+
+    let pill = PillBoxViewManager()
     
-    return false
-  }
-}
-
-if let readLine = readLine() {
-  print(checkIfStringContainsInteger(with: readLine))
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        pill.show(title: "Refreshing Data", vcView: self.view)
+        
+        // some time later...
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+          pill.didFinishTask = true // this indicates the task's success
+        }
+    }
 }
 
 ```
 
-### Conclusion:
+All you have to do is pass in a title message and your view controller's `UIView`
 
-Write a small conclusion for your repository
+## Conclusion
+
+Let me know how this is and help me improve this project with ideas, suggestions.
 
 ## Created and Maintained by:
 
