@@ -1,9 +1,12 @@
 # PillboxView
 
-Pillbox View shows a small bubble, pill looking box that sides from the top of the screen. You most likely have seen this throughout iOS when the ringer state is changed, Airpods are connected and when you copy your Discord ID, among others. 
+ [![Version](https://img.shields.io/cocoapods/v/PillboxView.svg?style=flat)](https://cocoapods.org/pods/PillboxView)
+ [![License](https://img.shields.io/cocoapods/l/PillboxView.svg?style=flat)](https://cocoapods.org/pods/PillboxView)
+ [![Platform](https://img.shields.io/cocoapods/p/PillboxView.svg?style=flat)](https://cocoapods.org/pods/PillboxView)
+
+Pillbox View shows a small bubble, pill looking box that sides from the top of the screen. You most likely have seen this throughout iOS when the ringer state is changed, Airpods are connected and when you copy your Discord ID, among others. This is great for showing an ongoing task in the background, like refreshing stale data when the user re-enters the app. This assures the user that something is happening and not to worry.
 
 > Note: Discord did not use this, they were my inspiration for creating this since I could not find a dependency that did this
-
 
 ## Installation
 
@@ -14,7 +17,9 @@ it, simply add the following line to your Podfile:
 pod 'PillboxView'
 ```
 
-## Example
+To run the example project, clone the repo, and run `pod install` from the Example directory first.
+
+## Features
 
 - Display a title message
 - Show an activity indicator to show ongoing activity ![IMG_439D92B0A93B-1](https://user-images.githubusercontent.com/70717139/147837941-3ebd4ed7-b547-4601-87f5-dec0c7d5f317.jpeg)
@@ -22,11 +27,8 @@ pod 'PillboxView'
   - Indicate your task's success with a green checkmark ![IMG_9C967D1A90FD-1](https://user-images.githubusercontent.com/70717139/147837835-c8090601-8134-42eb-acd3-463968d7a4d1.jpeg) 
  or failure with a red x ![IMG_72EF15491E30-1](https://user-images.githubusercontent.com/70717139/147837825-ce3c8894-f68c-4a08-94a8-38f3d5586fea.jpeg)
 - Animates between images and frames for clean effect
-=======
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
 ## Quick Start
-
 
 ```swift
 
@@ -34,33 +36,36 @@ import UIKit
 
 class ViewController: UIViewController {
 
-    let pill = PillBoxViewManager()
+    let pill = PillboxView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        pill.show(title: "Refreshing Data", vcView: self.view)
+        pill.showTask(message: "Refreshing Data", vcView: self.view)
         
         // some time later...
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-          pill.didFinishTask = true // this indicates the task's success
+          pill.completedTask(state: true)
         }
     }
 }
 
 ```
 
-All you have to do is pass in a title message and your view controller's `UIView`
+First, we create an instance of the Pillbox view. When the view loads, we immediately show the pill with an animating `UIActivityIndicator` (see 2nd point of Features), hence an ongoing task in the background. Some time later, which represents when the task completes, your task will finish successfully or unsuccessfully. Here, we can tell the user what happened through the `state` parameter in the `pill.completedTask(state: Bool)` function
 
 ## Conclusion
 
-Let me know how this is and help me improve this project with ideas, suggestions.
-
+Let me know how this is and help me improve this project with ideas and suggestions.
 
 ## Requirements
 
-iOS 13.0 or higher
+- iOS 13.0 or higher
 
 ## License
 
 PillboxView is available under the MIT license. See the LICENSE file for more info.
+
+## Authors:
+
+[Jacob Trentini](https://github.com/Awesomeplayer165)
