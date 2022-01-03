@@ -4,7 +4,6 @@ Pillbox View shows a small bubble, pill looking box that sides from the top of t
 
 > Note: Discord did not use this, they were my inspiration for creating this since I could not find a dependency that did this
 
-![IMG_A7E525EB0B26-1](https://user-images.githubusercontent.com/70717139/147837921-c4a14eae-843c-4483-959c-d13cea3458e2.png)
 
 ## Installation
 
