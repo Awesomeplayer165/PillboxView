@@ -1,5 +1,9 @@
 # PillboxView
 
+ [![Version](https://img.shields.io/cocoapods/v/PillboxView.svg?style=flat)](https://cocoapods.org/pods/PillboxView)
+ ![License](https://img.shields.io/cocoapods/l/PillboxView.svg?style=flat)
+ [![Platform](https://img.shields.io/cocoapods/p/PillboxView.svg?style=flat)](https://cocoapods.org/pods/PillboxView)
+
 Pillbox View shows a small bubble, pill looking box that sides from the top of the screen. You most likely have seen this throughout iOS when the ringer state is changed, Airpods are connected and when you copy your Discord ID, among others. 
 
 > Note: Discord did not use this, they were my inspiration for creating this since I could not find a dependency that did this
