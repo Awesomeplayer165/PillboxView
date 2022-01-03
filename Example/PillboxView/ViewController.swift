@@ -20,10 +20,6 @@ class ViewController: UIViewController {
         
         showPillboxViewButton.isEnabled = false
         finishedTaskButton   .isEnabled = true
-        
-        let imageView = UIImageView(image: UIImage(systemName: "exclamationmark.triangle")!.withTintColor(.systemRed))
-        imageView.frame = CGRect(x: 50, y: 100, width: 25, height: 25)
-        view.addSubview(imageView)
     }
     
     
