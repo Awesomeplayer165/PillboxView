@@ -18,7 +18,7 @@ pod 'PillboxView'
 ## Example
 
 - Display a title message
-- Show an activity indicator to show ongoing activity ![IMG_439D92B0A93B-1](https://user-images.githubusercontent.com/70717139/147837941-3ebd4ed7-b547-4601-87f5-dec0c7d5f317.jpeg)![image](https://user-images.githubusercontent.com/70717139/147894070-ad4bc883-f68b-4e10-8185-55d2a307e22f.png)
+- Show an activity indicator to show ongoing activity ![IMG_439D92B0A93B-1](https://user-images.githubusercontent.com/70717139/147837941-3ebd4ed7-b547-4601-87f5-dec0c7d5f317.jpeg)
 
   - Indicate your task's success with a green checkmark ![IMG_9C967D1A90FD-1](https://user-images.githubusercontent.com/70717139/147837835-c8090601-8134-42eb-acd3-463968d7a4d1.jpeg) 
  or failure with a red x ![IMG_72EF15491E30-1](https://user-images.githubusercontent.com/70717139/147837825-ce3c8894-f68c-4a08-94a8-38f3d5586fea.jpeg)
@@ -26,10 +26,11 @@ pod 'PillboxView'
 =======
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
-## Quick Start![image](https://user-images.githubusercontent.com/70717139/147894072-889acdf7-84e3-486d-9d6a-9dbd074b649a.png)
+## Quick Start
 
 
 ```swift
+
 import UIKit
 
 class ViewController: UIViewController {
