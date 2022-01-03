@@ -23,6 +23,36 @@ pod 'PillboxView'
 =======
 To run the example project, clone the repo, and run `pod install` from the Example directory first.
 
+## Quick Start
+
+```swift
+import UIKit
+
+class ViewController: UIViewController {
+
+    let pill = PillBoxViewManager()
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        pill.show(title: "Refreshing Data", vcView: self.view)
+        
+        // some time later...
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+          pill.didFinishTask = true // this indicates the task's success
+        }
+    }
+}
+
+```
+
+All you have to do is pass in a title message and your view controller's `UIView`
+
+## Conclusion
+
+Let me know how this is and help me improve this project with ideas, suggestions.
+
+
 ## Requirements
 
 iOS 13.0 or higher
