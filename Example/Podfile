@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '13.0'
+
+target 'PillboxView_Example' do
+  pod 'PillboxView', :path => '../'
+
+  target 'PillboxView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end

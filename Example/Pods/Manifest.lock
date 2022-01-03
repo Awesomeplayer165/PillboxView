@@ -1,0 +1,16 @@
+PODS:
+  - PillboxView (0.1.0)
+
+DEPENDENCIES:
+  - PillboxView (from `../`)
+
+EXTERNAL SOURCES:
+  PillboxView:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  PillboxView: a8dc54498a5a2997593d4056156d2ac6178fd007
+
+PODFILE CHECKSUM: b0e3703d53ee51a31503d772f8f8da03e15a7d01
+
+COCOAPODS: 1.10.1
