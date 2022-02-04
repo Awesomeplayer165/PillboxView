@@ -7,12 +7,7 @@ Pillbox View shows a small bubble, pill looking box that sides from the top of t
 
 ## Installation
 
-PillboxView is available through [CocoaPods](https://cocoapods.org). To install
-it, simply add the following line to your Podfile:
-
-```ruby
-pod 'PillboxView'
-```
+PillboxView is available through [Swift Package Manager](https://www.swift.org/package-manager).
 
 ## Example
 
