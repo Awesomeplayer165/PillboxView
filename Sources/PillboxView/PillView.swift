@@ -4,77 +4,120 @@
 //
 //  Created by Jacob Trentini on 12/30/21.
 //
+
 import UIKit
 
-public enum PillboxShowType {
-    case ongoingTask
-    case error
-}
-
-extension UIDevice {
-    var hasNotch: Bool {
-        let bottom = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.safeAreaInsets.bottom ?? 0
-        return bottom > 0
-    }
-}
-
+/// A `UIView` to display two forms of dynamic content based on the conditions or needs of a developer.
 public class PillView {
     
+    /// The `UIView` itself that holds the content of the ``PillboxView/PillView``, such as a title and imageView.
+    ///
+    ///  This shows information based on the ``PillboxView/PillShowType``.
+    ///  Both causes hold a title/message `UILabel` and a  `UIImageView`, customizable to the developer's suitable needs.
     public var pillView = UIView()
-    public var width:  Int
-    public var height: Int
-    private var activityIndicator: UIActivityIndicatorView
-    private var titleLabel = UILabel()
+    
+    /// The width of the ``PillboxView/PillView/pillView``.
+    public var width = 200
+    
+    /// The height of the ``PillboxView/PillView/pillView``.
+    ///
+    /// If a `UINavigationController` obstructs it, then add `45` to the `y` value when the ``PillboxView/PillView/pillView`` completes the animation sliding in. This will be addressed shortly in the future
+    public var height = 45
+    
+    /// A `UIActivityIndicatorView` for the asynchronous task of the ``PillboxView/PillShowType/ongoingTask``.
+    ///
+    /// This should not be used if using ``PillboxView/PillShowType/error``
+    public private(set) var activityIndicator = UIActivityIndicatorView()
+    
+    /// A `UILabel` align on the ``PillboxView/PillView/pillView``'s center-left to display a message.
+    ///
+    /// The message should not be set through accessing the properties of this label, but rather ``PillboxView/PillView/completedTask(state:completionHandler:)`` or ``PillboxView/PillView/showError(message:vcView:)``.
+    public private(set) var titleLabel = UILabel()
+    
+    /// A Boolean value indicating whether the current ``PillboxView/PillView`` is waiting for a task to complete.
+    ///
+    /// This only applies if the current ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``
     public var isAwaitingTaskCompletion = false
-    public var successSymbol: UIImage
-    public var failureSymbol: UIImage
-    public var errorSymbol:   UIImage
-    public var didFinishTask = false
-    public var vcView: UIView?
     
-    public var showType: PillboxShowType?
+    /// Shows the success symbol that should be used.
+    ///
+    /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
+    /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
+    public var successSymbol = UIImage(systemName: "checkmark.circle")!
     
-    public static var activePillBoxViews = Set<PillView>()
+    /// Shows the failure symbol that should be used.
+    ///
+    /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
+    /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
+    public var failureSymbol = UIImage(systemName: "x.circle")!
     
-    public init() {
-        self.width  = 200
-        self.height = 45
-        self.activityIndicator = UIActivityIndicatorView()
-        self.successSymbol = UIImage(systemName: "checkmark.circle")!
-        self.failureSymbol = UIImage(systemName: "x.circle")!
-        self.errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
-        self.showType = nil
+    
+    /// /// Shows the error symbol that should be used.
+    ///
+    /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/error``.
+    /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
+    public var errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
+    
+    /// This is your desired `UIView` that you would like displayed on. Most of the time, this will be: your `ViewController.view`, since `view` is taken from the `UIStoryboard`.
+    ///
+    /// Note: ``PillboxView/PillView`` does not need to be placed on a `UIViewController`, but could be placed on any such `UIView`.
+    public private(set) var vcView: UIView?
+    
+    /// This helps developers determine which type the ``PillboxView/PillShowType``.
+    ///
+    /// This is set automatically, and cannot be changed. This could come handy when you would want to filter out a specific case from the ``PillboxView/PillView/activePillBoxViews``.
+    public private(set) var showType: PillShowType? = nil
+    
+    /// The `Set` holds unique ``PillboxView/PillView`` shown on the screen at the given time.
+    ///
+    /// When ``PillboxView/PillView`` exit the screen, they are removed from this `Set`. There are numerous use cases for this:
+    /// - checking the number of ``PillboxView/PillView`` on the screen, so you can limit pills residing on the ``PillboxView/PillView/vcView``.
+    /// - Filter out a specific case from the ``PillboxView/PillView/activePillBoxViews``.
+    public private(set) static var activePillBoxViews = Set<PillView>()
+    
+    /// The basic initialization of ``PillboxView/PillView``, which includes all of the default parameters.
+    ///
+    /// Use the other initializers to set fields/values of the ``PillboxView/PillView``. While you could modify some of the fields/properties with default values, some of them cannot be mutated.
+    /// Note that ``PillboxView/PillView`` does not rely on this value, and is supposed to be for the developer's benefit/knowledge.
+    public init() { }
+    
+    /// This sets the ``PillboxView/PillView/showType`` ahead of when the computer will automatically set the value of this.
+    ///
+    /// The computer sets the value of this through the following functions:
+    /// - ``PillboxView/PillView/showTask(message:vcView:)``
+    /// - ``PillboxView/PillView/showError(message:vcView:)``
+    ///
+    /// Note that ``PillboxView/PillView`` does not rely on this value, and is supposed to be for the developer's benefit/knowledge.
+    ///
+    /// - Parameter showType: This helps developers determine which type the ``PillboxView/PillShowType``.
+    public init(showType: PillShowType) {
+        self.showType = showType
     }
     
+    /// Initializes with different values than the default width and height values
+    ///
+    /// - Parameters:
+    ///   - width: The width of the ``PillboxView/PillView/pillView``.
+    ///   - height: The height of the ``PillboxView/PillView/pillView``.
     public init(width: Int, height: Int) {
         self.width  = width
         self.height = height
-        self.activityIndicator = UIActivityIndicatorView()
-        self.successSymbol = UIImage(systemName: "checkmark.circle")!
-        self.failureSymbol = UIImage(systemName: "x.circle")!
-        self.errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
         self.showType = nil
     }
     
+    /// This allows developers to use their own `UIActivityIndicator` instead of the default.
+    ///
+    /// This can open a wide range of possibilities, including style, color, and animation preferences.
+    /// - Parameter activityIndicator: A `UIActivityIndicatorView` for the asynchronous task of the ``PillboxView/PillShowType/ongoingTask``.
     public init(activityIndicator: UIActivityIndicatorView) {
         self.activityIndicator = activityIndicator
-        self.width  = 200
-        self.height = 45
-        self.successSymbol = UIImage(systemName: "checkmark.circle")!
-        self.failureSymbol = UIImage(systemName: "x.circle")!
-        self.errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
         self.showType = nil
     }
     
-    open func hide(animated: Bool = true, completionHandler: (() -> Void)? = nil) {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-            UIView.animate(withDuration: 1, delay: 0.25) {
-                self.pillView.frame = CGRect(x: self.pillView.frame.minX, y: -300, width: self.pillView.frame.width, height: self.pillView.frame.height)
-                if let completionHandler = completionHandler { completionHandler() }
-            }
-        }
-    }
-    
+    /// <#Description#>
+    /// - Parameters:
+    ///   - state: <#state description#>
+    ///   - completionHandler: <#completionHandler description#>
     open func completedTask(state: Bool, completionHandler: (() -> Void)? = nil) {
         PillView.activePillBoxViews.remove(self)
         self.showType = nil
@@ -95,7 +138,7 @@ public class PillView {
                 imageView.isHidden = false
             }
             
-            hide()
+            dismiss()
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 imageView.removeFromSuperview()
@@ -163,6 +206,7 @@ public class PillView {
             self.pillView.frame = CGRect(x: Int(vcView.frame.midX),
                                          y: UIDevice.current.hasNotch ? 45: 25,
                                          width: self.width, height: self.height)
+            
             self.pillView.center.x = vcView.center.x
         }
         
@@ -218,7 +262,7 @@ public class PillView {
         isAwaitingTaskCompletion = true
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-            self.hide()
+            self.dismiss()
         }
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
@@ -229,32 +273,9 @@ public class PillView {
     }
 }
 
-extension PillView: Hashable {
-    public static func == (lhs: PillView, rhs: PillView) -> Bool {
-           lhs.pillView                 == rhs.pillView
-        && lhs.width                    == rhs.width
-        && lhs.height                   == rhs.height
-        && lhs.activityIndicator        == rhs.activityIndicator
-        && lhs.titleLabel               == rhs.titleLabel
-        && lhs.isAwaitingTaskCompletion == rhs.isAwaitingTaskCompletion
-        && lhs.successSymbol            == rhs.successSymbol
-        && lhs.failureSymbol            == rhs.failureSymbol
-        && lhs.errorSymbol              == rhs.errorSymbol
-        && lhs.didFinishTask            == rhs.didFinishTask
-        && lhs.vcView                   == rhs.vcView
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(pillView)
-        hasher.combine(width)
-        hasher.combine(height)
-        hasher.combine(activityIndicator)
-        hasher.combine(titleLabel)
-        hasher.combine(isAwaitingTaskCompletion)
-        hasher.combine(successSymbol)
-        hasher.combine(failureSymbol)
-        hasher.combine(errorSymbol)
-        hasher.combine(didFinishTask)
-        hasher.combine(vcView)
+extension UIDevice {
+    internal var hasNotch: Bool {
+        let bottom = UIApplication.shared.windows.filter {$0.isKeyWindow}.first?.safeAreaInsets.bottom ?? 0
+        return bottom > 0
     }
 }

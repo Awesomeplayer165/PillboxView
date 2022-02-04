@@ -1,5 +1,5 @@
 //
-//  PillboxColors.swift
+//  PillColors.swift
 //  PillboxView
 //
 //  Created by Jacob Trentini on 1/2/22.
