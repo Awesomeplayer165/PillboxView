@@ -1,5 +1,5 @@
 //
-//  PillboxView.swift
+//  PillView.swift
 //  PillboxView
 //
 //  Created by Jacob Trentini on 12/30/21.
@@ -18,21 +18,23 @@ extension UIDevice {
     }
 }
 
-public class PillboxView {
+public class PillView {
     
-    open var pillView = UIView()
-    open var width:  Int // 200
-    open var height: Int // 45
+    public var pillView = UIView()
+    public var width:  Int
+    public var height: Int
     private var activityIndicator: UIActivityIndicatorView
     private var titleLabel = UILabel()
-    open var isAwaitingTaskCompletion = false
-    open var successSymbol: UIImage
-    open var failureSymbol: UIImage
-    open var errorSymbol:   UIImage
-    open var didFinishTask = false
-    open var vcView: UIView?
+    public var isAwaitingTaskCompletion = false
+    public var successSymbol: UIImage
+    public var failureSymbol: UIImage
+    public var errorSymbol:   UIImage
+    public var didFinishTask = false
+    public var vcView: UIView?
     
-    static var activePillBoxViews = Set<PillboxView>()
+    public var showType: PillboxShowType?
+    
+    public static var activePillBoxViews = Set<PillView>()
     
     public init() {
         self.width  = 200
@@ -41,6 +43,7 @@ public class PillboxView {
         self.successSymbol = UIImage(systemName: "checkmark.circle")!
         self.failureSymbol = UIImage(systemName: "x.circle")!
         self.errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
+        self.showType = nil
     }
     
     public init(width: Int, height: Int) {
@@ -50,6 +53,7 @@ public class PillboxView {
         self.successSymbol = UIImage(systemName: "checkmark.circle")!
         self.failureSymbol = UIImage(systemName: "x.circle")!
         self.errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
+        self.showType = nil
     }
     
     public init(activityIndicator: UIActivityIndicatorView) {
@@ -59,6 +63,7 @@ public class PillboxView {
         self.successSymbol = UIImage(systemName: "checkmark.circle")!
         self.failureSymbol = UIImage(systemName: "x.circle")!
         self.errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
+        self.showType = nil
     }
     
     open func hide(animated: Bool = true, completionHandler: (() -> Void)? = nil) {
@@ -70,10 +75,9 @@ public class PillboxView {
         }
     }
     
-    // MARK: Task
-    
     open func completedTask(state: Bool, completionHandler: (() -> Void)? = nil) {
-        PillboxView.activePillBoxViews.remove(self)
+        PillView.activePillBoxViews.remove(self)
+        self.showType = nil
         
         DispatchQueue.main.async { [self] in
             guard
@@ -81,8 +85,8 @@ public class PillboxView {
                 let imageView  = pillView.viewWithTag(2) as? UIImageView
             else { return }
             
-            imageView.image = state ? successSymbol : failureSymbol
-            imageView.tintColor = state ? .systemGreen : .systemRed
+            imageView.image     = state ? successSymbol : failureSymbol
+            imageView.tintColor = state ? .systemGreen  : .systemRed
             imageView.isHidden = true
             
             UIView.transition(from: self.activityIndicator, to: imageView, duration: 0.25, options: .transitionCrossDissolve) { _ in
@@ -96,6 +100,7 @@ public class PillboxView {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 imageView.removeFromSuperview()
                 titleLabel.removeFromSuperview()
+                
                 if let completionHandler = completionHandler { completionHandler() }
             }
             
@@ -105,8 +110,10 @@ public class PillboxView {
     
     open func showTask(message: String, vcView: UIView) {
         
+        self.showType = .ongoingTask
+        
         self.vcView = vcView
-        PillboxView.activePillBoxViews.insert(self)
+        PillView.activePillBoxViews.insert(self)
         
         // pillView init
         pillView.frame = CGRect(x: Int(vcView.frame.midX), y: -300, width: width, height: height)
@@ -115,13 +122,16 @@ public class PillboxView {
         pillView.layer.cornerRadius = 20
         
         // shadow for pillView
-        pillView.layer.shadowColor = UIColor.black.cgColor
+        pillView.layer.shadowColor   = UIColor.black.cgColor
         pillView.layer.shadowOpacity = 0.1
-        pillView.layer.shadowOffset = .zero
-        pillView.layer.shadowRadius = 10
+        pillView.layer.shadowOffset  = .zero
+        pillView.layer.shadowRadius  = 10
         
         // titleLabel
-        titleLabel = UILabel(frame: CGRect(x: 0, y: 11, width: pillView.frame.width - 40, height: 23))
+        titleLabel = UILabel(frame: CGRect(x: 0,
+                                           y: 11,
+                                           width: pillView.frame.width - 40,
+                                           height: 23))
         titleLabel.text = message
         titleLabel.textAlignment = .center
         titleLabel.textColor = UIColor.PillboxTitleColor
@@ -150,7 +160,9 @@ public class PillboxView {
         
         UIView.animate(withDuration: 1) {
             
-            self.pillView.frame = CGRect(x: Int(vcView.frame.midX), y: UIDevice.current.hasNotch ? 45 + 40: 25 + 40, width: self.width, height: self.height) // add 40 because of navigation controller
+            self.pillView.frame = CGRect(x: Int(vcView.frame.midX),
+                                         y: UIDevice.current.hasNotch ? 45: 25,
+                                         width: self.width, height: self.height)
             self.pillView.center.x = vcView.center.x
         }
         
@@ -160,6 +172,9 @@ public class PillboxView {
     }
     
     public func showError(message: String, vcView: UIView) {
+        
+        self.showType = .error
+        
         // pillView init
         pillView.frame = CGRect(x: 100, y: -300, width: width, height: height)
         pillView.backgroundColor = UIColor.PillboxBackgroundColor
@@ -209,12 +224,13 @@ public class PillboxView {
         DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
             imageView.removeFromSuperview()
             self.titleLabel.removeFromSuperview()
+            self.showType = nil
         }
     }
 }
 
-extension PillboxView: Hashable {
-    public static func == (lhs: PillboxView, rhs: PillboxView) -> Bool {
+extension PillView: Hashable {
+    public static func == (lhs: PillView, rhs: PillView) -> Bool {
            lhs.pillView                 == rhs.pillView
         && lhs.width                    == rhs.width
         && lhs.height                   == rhs.height
