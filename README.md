@@ -4,6 +4,7 @@ Pillbox View shows a small bubble, pill looking box that sides from the top of t
 
 > Note: Discord does not use this dependency, they were my inspiration for creating this since I could not find a dependency that did this
 
+📝 [Here](https://docs.awesomeplayer.tech/documentation/pillboxview) is the API documentation for the latest version powered by [DocC](https://developer.apple.com/documentation/docc)
 
 ## Installation
 
