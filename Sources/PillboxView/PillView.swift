@@ -36,6 +36,9 @@ public class PillView {
     
     /// A Boolean value indicating whether the current ``PillboxView/PillView`` is waiting for a task to complete.
     ///
+    /// Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
+    /// This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
+    ///
     /// This only applies if the current ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``
     public var isAwaitingTaskCompletion = false
     
@@ -52,13 +55,15 @@ public class PillView {
     public var failureSymbol = UIImage(systemName: "x.circle")!
     
     
-    /// /// Shows the error symbol that should be used.
+    /// Shows the error symbol that should be used.
     ///
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/error``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
     public var errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
     
-    /// This is your desired `UIView` that you would like displayed on. Most of the time, this will be: your `ViewController.view`, since `view` is taken from the `UIStoryboard`.
+    /// The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
+    ///
+    /// Most of the time, this will be your `ViewController.view`, since `view` is derived from the `UIStoryboard`.
     ///
     /// Note: ``PillboxView/PillView`` does not need to be placed on a `UIViewController`, but could be placed on any such `UIView`.
     public private(set) var vcView: UIView?
@@ -114,13 +119,21 @@ public class PillView {
         self.showType = nil
     }
     
-    /// <#Description#>
+    /// Shows the result of your asynchronous task as a positive or negative
+    ///
+    /// Displays an animation that hides the ``PillboxView/PillView/activityIndicator`` and animates to ``PillboxView/PillView/successSymbol`` or ``PillboxView/PillView/failureSymbol`` image based on the `state` provided.
+    ///
+    /// In total, the animation takes 3 seconds to complete (3 seconds run asynchronously/parallel against ``PillboxView/PillView/dismiss(animated:completionHandler:)``.
+    ///
+    /// When the animation is complete, the views are destroyed or removed from the ``PillboxView/PillView/vcView`` and ``PillboxView/PillView/isAwaitingTaskCompletion`` is set to `false`. Additionally, the `completionHandler` is called. Finally, ``PillboxView/PillView/showType`` is set to `nil`.
+    ///
+    /// This should only be used when ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
+    ///
     /// - Parameters:
-    ///   - state: <#state description#>
-    ///   - completionHandler: <#completionHandler description#>
+    ///   - state: A Boolean value indicating whether the asynchronous task the ``PillboxView/PillView`` has been waiting on has been successful (true) or unsuccessful (false).
+    ///   - completionHandler: A completion handler indicating when the animation has finished.
     open func completedTask(state: Bool, completionHandler: (() -> Void)? = nil) {
         PillView.activePillBoxViews.remove(self)
-        self.showType = nil
         
         DispatchQueue.main.async { [self] in
             guard
@@ -143,6 +156,7 @@ public class PillView {
             DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 imageView.removeFromSuperview()
                 titleLabel.removeFromSuperview()
+                self.showType = nil
                 
                 if let completionHandler = completionHandler { completionHandler() }
             }
@@ -151,6 +165,18 @@ public class PillView {
         }
     }
     
+    
+    /// Starts the acknowledgement of the asynchronous task to the main UI
+    ///
+    /// The animation starts off by the ``PillboxView/PillView/pillView`` sliding into the view, preset with all of the `UI` components filled out. The animation, in total, takes 1 second. Finally, ``PillboxView/PillView/isAwaitingTaskCompletion`` is set to `true`.
+    ///
+    /// This should only be used when ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
+    ///
+    /// - Parameters:
+    ///   - message: The desired message the ``PillboxView/PillView/titleLabel`` should present.
+    ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
+    ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
+    ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
     open func showTask(message: String, vcView: UIView) {
         
         self.showType = .ongoingTask
@@ -215,6 +241,19 @@ public class PillView {
         isAwaitingTaskCompletion = true
     }
     
+    /// Starts the acknowledgement of the error of an instant task to the main UI.
+    ///
+    /// This should only be used when ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/error``.
+    ///
+    /// The sliding in animation starts off by the ``PillboxView/PillView/pillView`` sliding into the view, preset with all of the `UI` components filled out. This animation, in total, takes 1 second. After waiting three seconds, ``PillboxView/PillView/dismiss(animated:completionHandler:)`` is called, and it receeds after 4 more seconds. The total animation time is be 7 seconds because the animations run asynchronous/parallel.
+    ///
+    /// The ``PillboxView/PillView/isAwaitingTaskCompletion`` is not set to `true` here because of the only use of ``PillboxView/PillShowType/error``.
+    ///
+    /// - Parameters:
+    ///   - message: The desired message the ``PillboxView/PillView/titleLabel`` should present.
+    ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
+    ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
+    ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
     public func showError(message: String, vcView: UIView) {
         
         self.showType = .error
@@ -258,8 +297,6 @@ public class PillView {
         }
         
         vcView.addSubview(pillView)
-
-        isAwaitingTaskCompletion = true
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
             self.dismiss()

@@ -14,6 +14,8 @@ extension PillView {
     /// The ``PillboxView/PillView/pillView`` moves up to the top of the screen until it is out of sight.
     /// This is used within the ``PillboxView/PillView/completedTask(state:completionHandler:)`` and ``PillboxView/PillView/showError(message:vcView:)``.
     ///
+    /// The animation, in total, takes 3 seconds to complete.
+    ///
     /// This does not reset or de-initialize any values of the ``PillboxView/PillView``.
     ///
     /// - Parameters:
@@ -34,7 +36,7 @@ extension PillView {
     
     /// Hides the ``PillboxView/PillView/pillView`` to the top of the screen.
     ///
-    /// The ``PillboxView/PillView/pillView`` moves to the top of the screen until it is in sight (it usually comes from being dismissed.
+    /// The ``PillboxView/PillView/pillView`` moves to the top of the screen until it is in sight (it usually comes from being dismissed).
     ///
     /// - Parameters:
     ///   - animated: A Boolean indicating whether the ``PillboxView/PillView/pillView`` should be revealed with an animation.

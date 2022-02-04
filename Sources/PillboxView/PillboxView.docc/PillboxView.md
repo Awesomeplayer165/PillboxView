@@ -19,6 +19,9 @@ PillboxView shows a small bubble, pill looking rounded box that slides in from t
 - ``PillboxView/PillView/showTask(message:vcView:)``
 - ``PillboxView/PillView/completedTask(state:completionHandler:)``
 
+### Instant Erring
+- ``PillboxView/PillView/showError(message:vcView:)``
+
 ### Visual Transitions
 - ``PillboxView/PillView/reveal(animated:completionHandler:)``
 - ``PillboxView/PillView/dismiss(animated:completionHandler:)``
