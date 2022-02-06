@@ -21,7 +21,7 @@ public class PillView {
     
     /// The height of the ``PillboxView/PillView/pillView``.
     ///
-    /// If a `UINavigationController` obstructs it, then add `45` to the `y` value when the ``PillboxView/PillView/pillView`` completes the animation sliding in. This will be addressed shortly in the future
+    /// If a `UINavigationController` obstructs it, then set ``PillboxView/PillView/isNavigationControllerPresent`` to `true`
     public var height = 45
     
     /// A `UIActivityIndicatorView` for the asynchronous task of the ``PillboxView/PillShowType/ongoingTask``.
@@ -73,6 +73,12 @@ public class PillView {
     /// This is set automatically, and cannot be changed. This could come handy when you would want to filter out a specific case from the ``PillboxView/PillView/activePillBoxViews``.
     public private(set) var showType: PillShowType? = nil
     
+    /// A Boolean value to allowing ``PillboxView/PillView`` to work around having a `UINavigationController` at the top of the screen.
+    ///
+    /// The `UINavigationController` can block the top of the screen, thus obstructing the ``PillboxView/PillView/pillView``
+    /// Set this to true to let the ``PillboxView/PillView/pillView`` ``PillboxView/PillView/reveal(animated:completionHandler:)`` 40 pixels higher (y-axis, lower down on the screen from the top).
+    public var isNavigationControllerPresent = Bool()
+    
     /// The `Set` holds unique ``PillboxView/PillView`` shown on the screen at the given time.
     ///
     /// When ``PillboxView/PillView`` exit the screen, they are removed from this `Set`. There are numerous use cases for this:
@@ -97,6 +103,14 @@ public class PillView {
     /// - Parameter showType: This helps developers determine which type the ``PillboxView/PillShowType``.
     public init(showType: PillShowType) {
         self.showType = showType
+    }
+    
+    /// Initialize this value overriding the ``PillboxView/PillView/isNavigationControllerPresent`` value
+    /// - Parameter isNavigationControllerPresent: A Boolean value to allowing ``PillboxView/PillView`` to work around having a `UINavigationController` at the top of the screen.
+    ///
+    /// The default value of this is false.
+    public init(isNavigationControllerPresent: Bool) {
+        self.isNavigationControllerPresent = isNavigationControllerPresent
     }
     
     /// Initializes with different values than the default width and height values
@@ -230,7 +244,7 @@ public class PillView {
         UIView.animate(withDuration: 1) {
             
             self.pillView.frame = CGRect(x: Int(vcView.frame.midX),
-                                         y: UIDevice.current.hasNotch ? 45: 25,
+                                         y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
                                          width: self.width, height: self.height)
             
             self.pillView.center.x = vcView.center.x
@@ -292,7 +306,10 @@ public class PillView {
         pillView.addSubview(imageView)
 
         UIView.animate(withDuration: 1) {
-            self.pillView.frame = CGRect(x: 100, y: 45, width: self.width, height: self.height)
+            self.pillView.frame = CGRect(x: 100,
+                                         y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
+                                         width: self.width,
+                                         height: self.height)
             self.pillView.center.x = vcView.center.x
         }
         

@@ -45,7 +45,7 @@ extension PillView {
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
             UIView.animate(withDuration: 1, delay: 0.25) {
                 self.pillView.frame = CGRect(x: self.pillView.frame.minX,
-                                             y: UIDevice.current.hasNotch ? 45: 25,
+                                             y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
                                              width: self.pillView.frame.width,
                                              height: self.pillView.frame.height)
                 
