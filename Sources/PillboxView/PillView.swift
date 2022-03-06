@@ -191,6 +191,8 @@ public class PillView {
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
     ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
+    ///   - tintColor: A tint color for the `UIImageView` of the ``PillboxView/PillView/pillView/`` displayed on.
+    ///   - completionHandler: A completion handler indicating when the animation has finished.
     open func showTask(message: String, vcView: UIView, tintColor: UIColor?, completionHandler: (() -> Void)? = nil) {
         
         self.showType = .ongoingTask
@@ -271,7 +273,10 @@ public class PillView {
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
     ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
-    public func showError(message: String, vcView: UIView, tintColor: UIColor? = .systemRed, completionHandler: (() -> Void)? = nil) {
+    ///   - tintColor: A tint color for the `UIImageView` of the ``PillboxView/PillView/pillView/`` displayed on.
+    ///   - timeToShow: Length of time to show in seconds/double (`TimeInterval`). Note that this should be at least `2` seconds and that this does not include the animation times. See source code for animation timings
+    ///   - completionHandler: A completion handler indicating when the animation has finished.
+    public func showError(message: String, vcView: UIView, tintColor: UIColor? = .systemRed, timeToShow: TimeInterval = 2, completionHandler: (() -> Void)? = nil) {
         
         self.showType = .error
         
