@@ -191,7 +191,7 @@ public class PillView {
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
     ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
-    open func showTask(message: String, vcView: UIView, completionHandler: (() -> Void)? = nil) {
+    open func showTask(message: String, vcView: UIView, tintColor: UIColor?, completionHandler: (() -> Void)? = nil) {
         
         self.showType = .ongoingTask
         
@@ -233,6 +233,7 @@ public class PillView {
                                                   height: 23))
         
         imageView.isHidden = true
+        imageView.tintColor = tintColor
         imageView.tag = 2
         
         // moving/adding into frame
@@ -270,7 +271,7 @@ public class PillView {
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
     ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
-    public func showError(message: String, vcView: UIView, completionHandler: (() -> Void)? = nil) {
+    public func showError(message: String, vcView: UIView, tintColor: UIColor? = .systemRed, completionHandler: (() -> Void)? = nil) {
         
         self.showType = .error
         
@@ -300,7 +301,7 @@ public class PillView {
 
         imageView.tag = 4
         imageView.image = errorSymbol
-        imageView.tintColor = .systemRed
+        imageView.tintColor = tintColor
 
         // moving/adding into frame
 
