@@ -59,7 +59,7 @@ public class PillView {
     ///
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/error``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
-    public var errorSymbol   = UIImage(systemName: "wifi.exclamationmark")!
+    public var errorSymbol = UIImage(systemName: "wifi.exclamationmark")!
     
     /// The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
     ///
@@ -191,7 +191,7 @@ public class PillView {
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
     ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
-    open func showTask(message: String, vcView: UIView) {
+    open func showTask(message: String, vcView: UIView, completionHandler: (() -> Void)? = nil) {
         
         self.showType = .ongoingTask
         
@@ -248,6 +248,8 @@ public class PillView {
                                          width: self.width, height: self.height)
             
             self.pillView.center.x = vcView.center.x
+            
+            if let completionHandler = completionHandler { completionHandler() }
         }
         
         vcView.addSubview(pillView)
@@ -268,7 +270,7 @@ public class PillView {
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
     ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
-    public func showError(message: String, vcView: UIView) {
+    public func showError(message: String, vcView: UIView, completionHandler: (() -> Void)? = nil) {
         
         self.showType = .error
         
@@ -323,6 +325,7 @@ public class PillView {
             imageView.removeFromSuperview()
             self.titleLabel.removeFromSuperview()
             self.showType = nil
+            if let completionHandler = completionHandler { completionHandler() }
         }
     }
 }
