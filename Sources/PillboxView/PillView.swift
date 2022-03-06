@@ -278,6 +278,8 @@ public class PillView {
     ///   - completionHandler: A completion handler indicating when the animation has finished.
     public func showError(message: String, vcView: UIView, tintColor: UIColor? = .systemRed, timeToShow: TimeInterval = 2, completionHandler: (() -> Void)? = nil) {
         
+        let timeToShowErrorPill = timeToShow < 2 ? 2 : timeToShow
+        
         self.showType = .error
         
         // pillView init
@@ -323,11 +325,11 @@ public class PillView {
         
         vcView.addSubview(pillView)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1 + timeToShowErrorPill) {
             self.dismiss()
         }
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 7) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 5 + timeToShowErrorPill) {
             imageView.removeFromSuperview()
             self.titleLabel.removeFromSuperview()
             self.showType = nil
