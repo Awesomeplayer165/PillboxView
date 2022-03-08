@@ -19,6 +19,8 @@ PillboxView is available through [Swift Package Manager](https://www.swift.org/p
  or failure with a red x ![IMG_72EF15491E30-1](https://user-images.githubusercontent.com/70717139/147837825-ce3c8894-f68c-4a08-94a8-38f3d5586fea.jpeg)
 - Animates between images and frames for clean effect
 
+> The repo of a complete example app can be found [here](https://github.com/Awesomeplayer165/PillboxView-Example/)
+
 ## Quick Start
 
 ### Asynchronous Task
