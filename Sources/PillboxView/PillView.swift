@@ -193,7 +193,7 @@ public class PillView {
     ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
     ///   - tintColor: A tint color for the `UIImageView` of the ``PillboxView/PillView/pillView/`` displayed on.
     ///   - completionHandler: A completion handler indicating when the animation has finished.
-    open func showTask(message: String, vcView: UIView, tintColor: UIColor? = .systemBlue, completionHandler: (() -> Void)? = nil) {
+    open func showTask(message: String, vcView: UIView, tintColor: UIColor = .systemBlue, completionHandler: (() -> Void)? = nil) {
         
         self.showType = .ongoingTask
         
