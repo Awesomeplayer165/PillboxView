@@ -84,7 +84,7 @@ public class PillView {
     /// When ``PillboxView/PillView`` exit the screen, they are removed from this `Set`. There are numerous use cases for this:
     /// - checking the number of ``PillboxView/PillView`` on the screen, so you can limit pills residing on the ``PillboxView/PillView/vcView``.
     /// - Filter out a specific case from the ``PillboxView/PillView/activePillBoxViews``.
-    public private(set) static var activePillBoxViews = Set<PillView>()
+//    public private(set) static var activePillBoxViews = Set<PillView>()
     
     /// The basic initialization of ``PillboxView/PillView``, which includes all of the default parameters.
     ///
@@ -147,7 +147,7 @@ public class PillView {
     ///   - state: A Boolean value indicating whether the asynchronous task the ``PillboxView/PillView`` has been waiting on has been successful (true) or unsuccessful (false).
     ///   - completionHandler: A completion handler indicating when the animation has finished.
     open func completedTask(state: Bool, completionHandler: (() -> Void)? = nil) {
-        PillView.activePillBoxViews.remove(self)
+//        PillView.activePillBoxViews.remove(self)
         
         DispatchQueue.main.async { [self] in
             guard
@@ -198,7 +198,7 @@ public class PillView {
         self.showType = .ongoingTask
         
         self.vcView = vcView
-        PillView.activePillBoxViews.insert(self)
+//        PillView.activePillBoxViews.insert(self)
         
         // pillView init
         pillView.frame = CGRect(x: Int(vcView.frame.midX), y: -300, width: width, height: height)
