@@ -1,6 +1,6 @@
 # PillboxView
 
-Pillbox View shows a small bubble, pill looking box that sides from the top of the screen. You most likely have seen this throughout iOS when the ringer state is changed, Airpods are connected and when you copy your Discord ID, among others. 
+PillboxView is a small pill that presents a view on an asynchronous on-going task, the state of an asynchronous task, or instant task. It shows a small bubble, pill looking box that sides from the top of the screen. You most likely have seen this throughout iOS when the ringer state is changed, Airpods are connected and when you copy your Discord ID, among others. 
 
 > Note: Discord does not use this dependency, they were my inspiration for creating this since I could not find a dependency that did this
 
