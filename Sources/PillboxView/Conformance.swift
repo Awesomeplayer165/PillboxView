@@ -7,6 +7,7 @@
 
 import Foundation
 
+/*
 extension PillView: Hashable {
     public static func == (lhs: PillView, rhs: PillView) -> Bool {
            lhs.pillView                 == rhs.pillView
@@ -34,3 +35,4 @@ extension PillView: Hashable {
         hasher.combine(vcView)
     }
 }
+*/
