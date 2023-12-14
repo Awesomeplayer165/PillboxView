@@ -55,21 +55,32 @@ public class PillView: UXView {
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
     ///
+    #if os(macOS)
     public var successSymbol = UXImage(systemSymbolName: "checkmark.circle", accessibilityDescription: "Checkmark")
+    #else
+    public var successSymbol = UXImage(symbolName: "checkmark.circle")
+    #endif
     
     /// Shows the failure symbol that should be used.
     ///
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
+    #if os(macOS)
     public var failureSymbol = UXImage(systemSymbolName: "x.circle", accessibilityDescription: "Error X symbol")!
-    
+    #else
+    public var failureSymbol = UXImage(symbolName: "x.circle")!
+    #endif
     
     /// Shows the error symbol that should be used.
     ///
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/error``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
+    #if os(macOS)
     public var errorSymbol = UXImage(systemSymbolName: "wifi.exclamationmark", accessibilityDescription: "Wifi error")!
-    
+    #else
+    public var errorSymbol = UXImage(symbolName: "wifi.exclamationmark")!
+
+    #endif
     /// The desired `UXView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
     ///
     /// Most of the time, this will be your `ViewController.view`, since `view` is derived from the `UIStoryboard`.
