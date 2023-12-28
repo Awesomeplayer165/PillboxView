@@ -1,4 +1,4 @@
-name: ContinuousIntegration
+name: CI
 
 on:
   push:
@@ -23,12 +23,22 @@ jobs:
       matrix:
         destination:
           - "platform=macOS"
+          - "platform=macOS,variant=Mac Catalyst"
           - "platform=iOS Simulator,name=iPhone 11"
-          - "platform=tvOS Simulator,name=Apple TV"
 
     steps:
       - uses: actions/checkout@v4
       - name: Install XCBeautify
         run: brew install xcbeautify
+      - name: Set Default Scheme
+        run: |
+          scheme_list=$(xcodebuild -list -json | tr -d "\n")
+          default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
+          echo $default | cat >default
+          echo Using default scheme: $default
       - name: Test platform ${{ matrix.destination }}
-        run: set -o pipefail && xcodebuild -scheme NSUI -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
+	env:
+	  scheme: ${{ 'default' }}
+        run: |
+	  if [ $scheme = default ]; then scheme=$(cat default); fi
+	  set -o pipefail && xcodebuild -scheme "$scheme" -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
