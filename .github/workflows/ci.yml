@@ -30,6 +30,8 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install XCBeautify
         run: brew install xcbeautify
+      - name: Show buildable schemes
+        run: xcodebuild -list      
       - name: Set Default Scheme
         run: |
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
