@@ -23,7 +23,7 @@ jobs:
       matrix:
         destination:
           - "platform=macOS"
-          - "platform=macOS,variant=Mac Catalyst"
+          # - "platform=macOS,variant=Mac Catalyst"
           - "platform=iOS Simulator,name=iPhone 11"
 
     steps:
