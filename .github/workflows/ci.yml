@@ -1,0 +1,34 @@
+name: ContinuousIntegration
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'CODE_OF_CONDUCT.md'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'SECURITY.md'
+      - 'ios.yml'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test
+    runs-on: macOS-latest
+    strategy:
+      matrix:
+        destination:
+          - "platform=macOS"
+          - "platform=iOS Simulator,name=iPhone 11"
+          - "platform=tvOS Simulator,name=Apple TV"
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XCBeautify
+        run: brew install xcbeautify
+      - name: Test platform ${{ matrix.destination }}
+        run: set -o pipefail && xcodebuild -scheme NSUI -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
