@@ -13,34 +13,42 @@ import AppKit
 #endif
 
 // ---
-import UXKit     // To unify AppKit and UIKit and add macOS compatibility
+import NSUI     // To unify AppKit and UIKit and add macOS compatibility
 
 
-/// A `UIView` to display two forms of dynamic content based on the conditions or needs of a developer.
-public class PillView: UXView {
-    /// The `UXView` itself that holds the content of the ``PillboxView/PillView``, such as a title and imageView.
+/// A `NSUIView` to display two forms of dynamic content based on the conditions or needs of a developer.
+public class PillView: NSUIView {
+    /// The `NSUIView` itself that holds the content of the ``PillboxView/PillView``, such as a title and imageView.
     ///
     ///  This shows information based on the ``PillboxView/PillShowType``.
     ///  Both causes hold a title/message `NSUILabel` and a  `NSUIImageView`, customizable to the developer's suitable needs.
+    
+    // ?? Do we need to define another UXView here. This implementation is deriving from UXView ??
     // public var pillView = UXView()
 
     /// The width of the ``PillboxView/PillView/pillView``.
-    public var width = 400
+    private static let defaultWidth: CGFloat = 400
+    public var width: CGFloat {
+        return self.frame.width
+    }
     
     /// The height of the ``PillboxView/PillView/pillView``.
     ///
     /// If a `UINavigationController` obstructs it, then set ``PillboxView/PillView/isNavigationControllerPresent`` to `true`
-    public var height = 35
+    private static let defaultHeight: CGFloat = 200
+    public var height: CGFloat {
+        return self.frame.height
+    }
     
-    /// A `UXSpinner` aka `NSUIActivityIndicatorView` in UIKIt for the asynchronous task of the ``PillboxView/PillShowType/ongoingTask``.
+    /// A `NSSpinner` aka `NSUIActivityIndicatorView` in UIKIt for the asynchronous task of the ``PillboxView/PillShowType/ongoingTask``.
     ///
     /// This should not be used if using ``PillboxView/PillShowType/error``
-    public private(set) var activityIndicator = UXSpinner()
+    public private(set) var activityIndicator = NSUIActivityIndicatorView()
     
-    /// A `UXLabel` align on the ``PillboxView/PillView/pillView``'s center-left to display a message.
+    /// A `NSUILabel` align on the ``PillboxView/PillView/pillView``'s center-left to display a message.
     ///
     /// The message should not be set through accessing the properties of this label, but rather ``PillboxView/PillView/completedTask(state:completionHandler:)`` or ``PillboxView/PillView/showError(message:vcView:)``.
-    public private(set) var titleLabel = UXLabel()
+    public private(set) var titleLabel = NSUILabel()
     
     /// A Boolean value indicating whether the current ``PillboxView/PillView`` is waiting for a task to complete.
     ///
@@ -55,53 +63,41 @@ public class PillView: UXView {
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
     ///
-    #if os(macOS)
-    public var successSymbol = UXImage(systemSymbolName: "checkmark.circle", accessibilityDescription: "Checkmark")
-    #else
-    public var successSymbol = UXImage(symbolName: "checkmark.circle")
-    #endif
+    public var successSymbol = NSUIImage(systemName: "checkmark.circle")
     
     /// Shows the failure symbol that should be used.
     ///
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/ongoingTask``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
-    #if os(macOS)
-    public var failureSymbol = UXImage(systemSymbolName: "x.circle", accessibilityDescription: "Error X symbol")!
-    #else
-    public var failureSymbol = UXImage(symbolName: "x.circle")!
-    #endif
+    public var failureSymbol = NSUIImage(systemName: "x.circle")!
     
     /// Shows the error symbol that should be used.
     ///
     /// Note: This will only be used for the ``PillboxView/PillView/showType`` = ``PillboxView/PillShowType/error``.
     /// Make sure that the symbol forms an even aspect ration of 30 by 30 for the best quality.
-    #if os(macOS)
-    public var errorSymbol = UXImage(systemSymbolName: "wifi.exclamationmark", accessibilityDescription: "Wifi error")!
-    #else
-    public var errorSymbol = UXImage(symbolName: "wifi.exclamationmark")!
+    public var errorSymbol = NSUIImage(systemName: "wifi.exclamationmark")!
 
-    #endif
-    /// The desired `UXView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
+    /// The parent `NSUIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
     ///
-    /// Most of the time, this will be your `ViewController.view`, since `view` is derived from the `UIStoryboard`.
-    ///
-    /// Note: ``PillboxView/PillView`` does not need to be placed on a `UXViewController`, but could be placed on any such `UXView`.
-    public private(set) weak var vcView: UXView!
+    /// Note: ``PillboxView/PillView`` does not need to be placed on a `NSUIViewController`, but could be placed on any such `NSUIView`.
+    public private(set) weak var vcView: NSUIView!
     
     /// This helps developers determine which type the ``PillboxView/PillShowType``.
     ///
     /// This is set automatically, and cannot be changed. This could come handy when you would want to filter out a specific case from the ``PillboxView/PillView/activePillBoxViews``.
     public private(set) var showType: PillShowType? = nil
     
+    #if os(iOS)
     /// A Boolean value to allowing ``PillboxView/PillView`` to work around having a `UINavigationController` at the top of the screen.
     ///
     /// The `UINavigationController` can block the top of the screen, thus obstructing the ``PillboxView/PillView/pillView``
     /// Set this to true to let the ``PillboxView/PillView/pillView`` ``PillboxView/PillView/reveal(animated:completionHandler:)`` 40 pixels higher (y-axis, lower down on the screen from the top in UIKit world).
     public var isNavigationControllerPresent = Bool()
+    #endif
     
     /// The font to be used for displaying ``PillboxView/PillView`` messages on the screen.
     /// By default, the font is nil and defaults to the normal font.
-    public private(set) var font: UXFont? = nil
+    public private(set) var font: NSUIFont? = nil
     
     /// The `Set` holds unique ``PillboxView/PillView`` shown on the screen at the given time.
     ///
@@ -114,7 +110,7 @@ public class PillView: UXView {
     ///
     /// Use the other initializers to set fields/values of the ``PillboxView/PillView``. While you could modify some of the fields/properties with default values, some of them cannot be mutated.
     public init() {
-        super.init(frame: NSZeroRect)
+        super.init(frame: NSRect(origin: NSZeroPoint, size: NSSize(width: Self.defaultWidth, height: Self.defaultHeight)))
         self._internalInit()
     }
     
@@ -132,7 +128,7 @@ public class PillView: UXView {
         #if os(macOS)
         self.wantsLayer = true
         #endif
-        self.frame.size = CGSize(width: self.width, height: self.height)
+       // self.frame.size = CGSize(width: self.width, height: self.height)
     }
     
     /// This sets the ``PillboxView/PillView/showType`` ahead of when the computer will automatically set the value of this.
@@ -148,21 +144,30 @@ public class PillView: UXView {
     ///     Default is nil which will used the default font for the platform
     /// - Parameter isNavigationControllerPresent: A Boolean value to allowing ``PillboxView/PillView`` to work around having a `UINavigationController` at the top of the screen.
     ///     The default value of this is false.
-    public convenience init(showType: PillShowType? = nil, font: UXFont? = nil, isNavigationControllerPresent: Bool = false) {
-        self.init(frame: NSZeroRect)
-        self.frame.size = CGSize(width: self.width, height: self.height)
-
+    #if os(macOS)
+    public convenience init(showType: PillShowType? = nil, font: NSUIFont? = nil) {
+        self.init()
         self.showType = showType
         self.font = font
+    }
+    #else
+    public convenience init(showType: PillShowType? = nil, font: NSUIFont? = nil, isNavigationControllerPresent: Bool = false) {
+        self.init()
+        self.showType = showType
+        self.font = font
+        
         self.isNavigationControllerPresent = isNavigationControllerPresent
     }
-        
+    #endif
+    
+    #if os(iOS)
     /// Initialize this value overriding the ``PillboxView/PillView/isNavigationControllerPresent`` value
     public convenience init(isNavigationControllerPresent: Bool) {
-        self.init(frame: NSZeroRect)
-
+        self.init()
         self.isNavigationControllerPresent = isNavigationControllerPresent
     }
+    #endif
+    
     
     /// Initializes with different values than the default width and height values
     ///
@@ -172,17 +177,19 @@ public class PillView: UXView {
     public convenience init(width: Int, height: Int) {
         self.init(frame: CGRect(x: 0, y: 0, width: width, height: height))
 
+        /*
         self.width  = width
         self.height = height
+        */
         self.showType = nil
     }
     
-    /// This allows developers to use their own `UXActivityIndicator` instead of the default.
+    /// This allows developers to use their own `ActivityIndicator` instead of the default.
     ///
     /// This can open a wide range of possibilities, including style, color, and animation preferences.
-    /// - Parameter activityIndicator: A `UXSpinner` for the asynchronous task of the ``PillboxView/PillShowType/ongoingTask``.
-    public convenience init(activityIndicator: UXSpinner) {
-        self.init(frame: NSZeroRect)
+    /// - Parameter activityIndicator: A `NSUIActivityIndicatorView` for the asynchronous task of the ``PillboxView/PillShowType/ongoingTask``.
+    public convenience init(activityIndicator: NSUIActivityIndicatorView) {
+        self.init()
 
         self.activityIndicator = activityIndicator
         self.showType = nil
@@ -206,10 +213,11 @@ public class PillView: UXView {
     open func completedTask(state: Bool, message: String? = nil, timeBeforeMoveOut: TimeInterval = 1.5, completionHandler: (() -> Void)? = nil) {
 //        PillView.activePillBoxViews.remove(self)
         
-        DispatchQueue.main.async { [self] in
+        DispatchQueue.main.async { [weak self] in
+            guard let self = self else { return }
             guard
-                let titleLabel = self.viewWithTag(1) as? UXLabel,
-                let imageView  = self.viewWithTag(2) as? UXImageView
+                let titleLabel = self.viewWithTag(1) as? NSUILabel,
+                let imageView  = self.viewWithTag(2) as? NSUIImageView
             else { return }
             
             // Display the new message upon completion is specified
@@ -218,7 +226,7 @@ public class PillView: UXView {
             }
             
             imageView.image = state ? self.successSymbol : self.failureSymbol
-            imageView.tintColor = state ? UXColor.systemGreen  : UXColor.systemRed
+            imageView.tintColor(color: state ? NSUIColor.systemGreen  : NSUIColor.systemRed)
             imageView.isHidden = true
             
             #if os(macOS)
@@ -264,20 +272,20 @@ public class PillView: UXView {
     ///   - message: The desired message the ``PillboxView/PillView/titleLabel`` should present.
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
-    ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
-    ///   - tintColor: A tint color for the `UIImageView` of the ``PillboxView/PillView/pillView/`` displayed on.
+    ///   - vcView: The desired `NSUIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
+    ///   - tintColor: A tint color for the `NSUIImageView` of the ``PillboxView/PillView/pillView/`` displayed on.
     ///   - completionHandler: A completion handler indicating when the animation has finished.
-    open func showTask(message: String, vcView: UXView, tintColor: UXColor = UXColor.systemBlue, completionHandler: (() -> Void)? = nil) {
+    open func showTask(message: String, vcView: NSUIView, tintColor: NSUIColor = NSUIColor.systemBlue, completionHandler: (() -> Void)? = nil) {
         // Now configure against the view hierarchy. Mostly centering the pill initial position
         self.configurePill(parentView: vcView)
 
         self.showType = .ongoingTask
                 
         // titleLabel which should be centered within the superview
-        self.titleLabel = UXLabel(frame: UXRect(x: 0,
-                                                y: 6,
-                                                width: self.frame.width - 40,
-                                                height: 23))
+        self.titleLabel = NSUILabel(frame: NSRect(x: 0,
+                                                  y: 6,
+                                                  width: self.frame.width - 40,
+                                                  height: 23))
 
         self.titleLabel.text = message
         self.titleLabel.textAlignment = .center
@@ -285,31 +293,35 @@ public class PillView: UXView {
         #if os(macOS)
         self.titleLabel.isBordered = false
         #endif
-        self.titleLabel.textColor = UXColor.PillboxTitleColor
+        self.titleLabel.textColor = NSUIColor.PillboxTitleColor
         self.titleLabel.backgroundColor = .clear
         self.titleLabel.tag = 1
-        
-        // activityIndicator
-        self.activityIndicator = UXSpinner(frame: UXRect(x: self.titleLabel.frame.maxX,
-                                                         y: 10,
-                                                         width: 16,
-                                                         height: 16))
+        self.centerVertically(subview: self.titleLabel, horizontalAlignment: .leading)
+
+        // Setup activityIndicator
+        self.activityIndicator = NSUIActivityIndicatorView(frame: NSRect(x: self.titleLabel.frame.maxX,
+                                                           y: 10,
+                                                           width: 16,
+                                                           height: 16))
         #if os(macOS)
         self.activityIndicator.style = .spinning
         self.activityIndicator.controlSize = .small
         #endif
-        self.activityIndicator.isSpinning = true
+        self.activityIndicator.startAnimating()
+        self.centerVertically(subview: self.activityIndicator, horizontalAlignment: .trailing)
         
-        let imageView = UXImageView(frame: UXRect(x: self.titleLabel.frame.maxX,
-                                                  y: 10,
-                                                  width: 16,
-                                                  height: 16))
+        // Setup completed task imageView
+        let imageView = NSUIImageView(frame: NSRect(x: self.titleLabel.frame.maxX,
+                                                    y: 10,
+                                                    width: 16,
+                                                    height: 16))
         
         imageView.isHidden = true
-        imageView.tintColor = tintColor
+        imageView.tintColor(color: tintColor)
         imageView.tag = 2
-        
-        // moving/adding into view hierarchy
+        self.centerVertically(subview: imageView, horizontalAlignment: .trailing)
+            
+        // Inserting into view hierarchy
         self.addSubview(titleLabel)
         self.addSubview(activityIndicator)
         self.addSubview(imageView)
@@ -318,7 +330,7 @@ public class PillView: UXView {
         NSAnimationContext.runAnimationGroup{ context in
             context.duration = 1.0
             context.allowsImplicitAnimation = true
-            context.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)
+            context.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
 
             // Need to calculate the origin of the pill view from the center point
             let origin = self.originForCenter(inRelationTo: vcView)
@@ -326,7 +338,7 @@ public class PillView: UXView {
             self.frame.origin = CGPoint(x: origin.x, y: yPos)
         }
         #else
-        UIView.animate(withDuration: 1) {
+        NSUIView.animate(withDuration: 1) {
             self.pillView.frame = UXRect(x: Int(vcView.frame.midX),
                                          y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
                                          width: self.width, height: self.height)
@@ -336,10 +348,23 @@ public class PillView: UXView {
             if let completionHandler = completionHandler { completionHandler() }
         }
 
-//        vcView.addSubview(self.pillView)
+//        vcView.addSubview(self.pillView)  /* This is not performed in the configurePill(parentView:) function
         #endif
         
         self.isAwaitingTaskCompletion = true
+    }
+    
+    ///
+    /// Update the task pill with a new message
+    public func updateTask(message: String) {
+        guard
+            self.isAwaitingTaskCompletion
+        else {
+            return
+        }
+            
+        // TODO: This new message should be animated to replace the previous one.
+        self.titleLabel.text = message
     }
     
     /// Starts the acknowledgement of the error of an instant task to the main UI.
@@ -354,22 +379,22 @@ public class PillView: UXView {
     ///   - message: The desired message the ``PillboxView/PillView/titleLabel`` should present.
     ///   Make sure this message is short and concise; otherwise, it will hang off the ``PillboxView/PillView/pillView``, assuming the use of the default ``PillboxView/PillView/width`` value of  `200`
     ///   This ``PillboxView/PillView/titleLabel`` is left-center aligned, and the ``PillboxView/PillView/activityIndicator`` is right-center aligned.
-    ///   - vcView: The desired `UIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
+    ///   - vcView: The desired `NSUIView` that you would like the ``PillboxView/PillView/pillView`` displayed on.
     ///   - tintColor: A tint color for the `UIImageView` of the ``PillboxView/PillView/pillView/`` displayed on.
     ///   - timeToShow: Length of time to show in seconds/double (`TimeInterval`). Note that this should be at least `2` seconds and that this does not include the animation times. See source code for animation timings
     ///   - completionHandler: A completion handler indicating when the animation has finished.
-    public func showError(message: String, vcView: UXView, tintColor: UXColor? = .systemRed, timeToShow: TimeInterval = 2, completionHandler: (() -> Void)? = nil) {
+    public func showError(message: String, vcView: NSUIView, tintColor: NSUIColor? = .systemRed, timeToShow: TimeInterval = 2, completionHandler: (() -> Void)? = nil) {
         self.configurePill(parentView: vcView)
 
         let timeToShowErrorPill = timeToShow < 2 ? 2 : timeToShow
         self.showType = .error
      
         // titleLabel
-        self.titleLabel = UXLabel(frame: UXRect(x: 0, y: 6, width: self.frame.width - 40, height: 23))
+        self.titleLabel = NSUILabel(frame: NSRect(x: 0, y: 6, width: self.frame.width - 40, height: 23))
         self.titleLabel.text = message
         self.titleLabel.textAlignment = .center
         self.titleLabel.font = self.font
-        self.titleLabel.textColor = UXColor.PillboxTitleColor
+        self.titleLabel.textColor = NSUIColor.PillboxTitleColor
         self.titleLabel.backgroundColor = .clear
 
         #if os(macOS)
@@ -378,13 +403,13 @@ public class PillView: UXView {
         self.titleLabel.tag = 3
 
         // imageView
-        let imageView = UXImageView(frame: UXRect(x: titleLabel.frame.maxX,
-                                                  y: 6,
-                                                  width: (self.frame.width - 15) - titleLabel.frame.maxX,
-                                                  height: 23))
+        let imageView = NSUIImageView(frame: NSRect(x: titleLabel.frame.maxX,
+                                                    y: 6,
+                                                    width: (self.frame.width - 15) - titleLabel.frame.maxX,
+                                                    height: 23))
 
         imageView.image = errorSymbol
-        imageView.tintColor = tintColor
+        imageView.tintColor(color: tintColor!)
         imageView.tag = 4
 
         // moving/adding into frame
@@ -399,9 +424,9 @@ public class PillView: UXView {
         NSAnimationContext.runAnimationGroup{ context in
             context.duration = 1.0
             context.allowsImplicitAnimation = true
-            context.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeIn)
+            context.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
 
-            self.frame.origin = UXPoint(x: originX, y: originY)
+            self.frame.origin = CGPoint(x: originX, y: originY)
             // Need to center the pillView within the vcView
             // Using autolayout constaints
             //self.pillView.centerXAnchor.constraint(equalTo: vcView.centerXAnchor).isActive = true
@@ -434,7 +459,7 @@ public class PillView: UXView {
     }
     
     /// Common configuration settings
-    private func configurePill(parentView: UXView) {
+    private func configurePill(parentView: NSUIView) {
         let originX = self.originForCenter(inRelationTo: parentView).x
         let originY = parentView.frame.height /* Offset above top edge (positive value) */ + 50.0
         self.frame.origin = CGPoint(x: originX, y: originY)
@@ -442,7 +467,7 @@ public class PillView: UXView {
         #if os(macOS)
         // Define our shadow
         let shadow              = NSShadow()
-        shadow.shadowColor      = UXColor.black.withAlphaComponent(0.2)
+        shadow.shadowColor      = NSUIColor.black.withAlphaComponent(0.2)
         shadow.shadowOffset     = CGSizeMake(0.0, -3.0)
         shadow.shadowBlurRadius = 10.0
         
@@ -451,26 +476,38 @@ public class PillView: UXView {
         self.shadow = shadow
         
         // Define our pill property
-        self.layer!.backgroundColor = UXColor.PillboxBackgroundColor.cgColor
-        self.layer!.cornerRadius  = 10
-        self.layer!.borderColor   = UXColor.lightGray.cgColor
+        self.layer!.backgroundColor = NSUIColor.PillboxBackgroundColor.cgColor
+        self.layer!.cornerRadius  = 20
+        self.layer!.borderColor   = NSUIColor.lightGray.cgColor
         self.layer!.borderWidth   = 0.2
 
         #else
         let layer = self.layer
-        layer.backgroundColor = UXColor.PillboxBackgroundColor
+        layer.backgroundColor = NSUIColor.PillboxBackgroundColor
         layer.cornerRadius  = 20
         layer.shadowOpacity = 0.1
         layer.shadowOffset  = .zero
-        layer.shadowColor   = UXColor.black.cgColor
+        layer.shadowColor   = NSUIColor.black.cgColor
         layer.shadowRadius  = 10
         #endif
 
-        // And add resizing mask so both the left and right side has flexible margins
-        // and pill is horizontally centered into containing view.
+        // And add resizing mask so both the left and right side have flexible margins
+        // and pill is horizontally centered into containing view when resizing
         self.autoresizingMask = [.minXMargin, .maxXMargin]
+        
+        // Add it to the hierarchy and retain parent
         parentView.addSubview(self)
         self.vcView = parentView
+    }
+    
+    ///
+    /// Vertically center a subview within the pillView with the specified horizontal alignment
+    ///
+    private func centerVertically(subview: NSUIView, horizontalAlignment: NSRectAlignment) {
+        // TODO: This function is not doign anything useful yet...
+        let originX = subview.frame.origin.x
+        let originY = subview.frame.origin.y
+        subview.frame = NSRect(origin: CGPoint(x: originX, y: originY), size: subview.frame.size)
     }
 }
 

@@ -9,9 +9,6 @@ import AppKit
 #endif
 import Foundation
 
-// ---
-import UXKit
-
 extension PillView {
     
     /// Hides the ``PillboxView/PillView/pillView`` to the top of the screen.

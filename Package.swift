@@ -19,7 +19,7 @@ let package = Package(
     ],
     dependencies: [
         // Add NSUI to support macOS compatibility
-        .package(url: "file:///Users/mdufort/dev/project/UXKit", branch: "main"),
+        .package(url: "https://github.com/mattmassicotte/nsui", branch: "main"),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.
@@ -27,7 +27,7 @@ let package = Package(
         .target(
             name: "PillboxView",
             dependencies: [
-                .product(name: "UXKit", package: "UXKit"),
+                .product(name: "NSUI", package: "nsui")
             ],
             path: "Sources"),
         .testTarget(

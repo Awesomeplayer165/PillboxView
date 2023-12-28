@@ -10,6 +10,13 @@ PillboxView is a small pill that presents a view on an asynchronous on-going tas
 
 PillboxView is available through [Swift Package Manager](https://www.swift.org/package-manager).
 
+## Project Dependency
+In order to support both native `AppKit` and `UIKit`, PillboxView is leveraging the `NSUI` project. 
+[NSUI](https://github.com/mattmassicotte/nsui) allows a single codebase to support both platforms with less #if pragma statements
+
+The package description file `package.swift` defines that dependency. You should be aware of that information before including
+`PillboxView` into your own project
+
 ## Example
 
 - Display a title message
@@ -41,7 +48,10 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        pill.show(title: "Refreshing Data", vcView: self.view)
+        pill.showTask(message: "Refreshing Data", vcView: self.view)
+        
+        // Update the task message while the task is ongoing
+        pill.updateTask(message: "Still refreshing data...")
         
         // some time later...
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {

@@ -4,53 +4,53 @@
 //
 //  Created by Jacob Trentini on 1/2/22.
 
-import UXKit
+import NSUI
 #if canImport(AppKit)
 import AppKit
 #endif
 
-internal extension UXColor {
+internal extension NSUIColor {
     #if os(macOS)
     @available(OSX 10.14, *)
-    static var isLight: Bool { NSApp.effectiveAppearance.name == NSAppearance.Name.aqua }
+    static var isLightModeOn: Bool { NSApp.effectiveAppearance.name == NSAppearance.Name.aqua }
     
     @available(OSX 10.14, *)
-    static var isDark: Bool { NSApp.effectiveAppearance.name == NSAppearance.Name.darkAqua }
+    static var isDarkModeOn: Bool { NSApp.effectiveAppearance.name == NSAppearance.Name.darkAqua }
     #endif
     
-    static var PillboxBackgroundColor: UXColor {
+    static var PillboxBackgroundColor: NSUIColor {
         #if os(macOS)
-        if UXColor.isLight {
-            return UXColor.white
+        if NSUIColor.isLightModeOn {
+            return NSUIColor.white
         }
         else {
-            return UXColor.lightGray
+            return NSUIColor.lightGray
         }
         #else
-        return UXColor { (traits) -> UXColor in
+        return NSUIColor { (traits) -> NSUIColor in
             // Return one of two colors depending on light or dark mode
             
             #if targetEnvironment(macCatalyst)
                 return traits.userInterfaceStyle == .light ?
-                .white : UXColor(red: 0.09, green: 0.09, blue: 0.09, alpha: 1)
+                .white : NSUIColor(red: 0.09, green: 0.09, blue: 0.09, alpha: 1)
             #else
                 return traits.userInterfaceStyle == .light ?
-                .white : UXColor(red: 0.12941176, green: 0.12156863, blue: 0.10588235, alpha: 1)
+                .white : NSUIColor(red: 0.12941176, green: 0.12156863, blue: 0.10588235, alpha: 1)
             #endif
         }
         #endif
     }
     
-    static var PillboxTitleColor: UXColor {
+    static var PillboxTitleColor: NSUIColor {
         #if os(macOS)
-        if UXColor.isLight {
-            return UXColor.black
+        if NSUIColor.isLightModeOn {
+            return NSUIColor.darkGray
         }
         else {
-            return UXColor.white
+            return NSUIColor.white
         }
         #else
-        return UXColor(displayP3Red: 0.54117647, green: 0.5372549, blue: 0.55294118, alpha: 1)
+        return NSUIColor(displayP3Red: 0.54117647, green: 0.5372549, blue: 0.55294118, alpha: 1)
         #endif
     }
 }

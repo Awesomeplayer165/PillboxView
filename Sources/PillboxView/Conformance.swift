@@ -8,6 +8,8 @@
 import Foundation
 
 /*
+ // Deriving PillView from NSUIView (aka UIView) provides Hashable conformance automatically
+ // The code below in unneeded
 extension PillView: Hashable {
     public static func == (lhs: PillView, rhs: PillView) -> Bool {
            lhs.pillView                 == rhs.pillView
