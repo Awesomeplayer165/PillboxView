@@ -1,4 +1,4 @@
-name: ContinuousIntegration
+name: CI
 
 on:
   push:
@@ -23,12 +23,12 @@ jobs:
       matrix:
         destination:
           - "platform=macOS"
+          - "platform=macOS,variant=Mac Catalyst"
           - "platform=iOS Simulator,name=iPhone 11"
-          - "platform=tvOS Simulator,name=Apple TV"
 
     steps:
       - uses: actions/checkout@v4
       - name: Install XCBeautify
         run: brew install xcbeautify
       - name: Test platform ${{ matrix.destination }}
-        run: set -o pipefail && xcodebuild -scheme NSUI -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
+        run: set -o pipefail && xcodebuild -scheme default -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
