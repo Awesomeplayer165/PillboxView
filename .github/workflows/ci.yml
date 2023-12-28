@@ -32,15 +32,12 @@ jobs:
         run: brew install xcbeautify
       - name: Show buildable schemes
         run: xcodebuild -list      
-      - name: Set Default Scheme
+      - name: Set Scheme
         run: |
           scheme_list=$(xcodebuild -list -json | tr -d "\n")
           default=$(echo $scheme_list | ruby -e "require 'json'; puts JSON.parse(STDIN.gets)['project']['targets'][0]")
           echo $default | cat >default
           echo Using default scheme: $default
       - name: Test platform ${{ matrix.destination }}
-	env:
-	  scheme: ${{ 'default' }}
         run: |
-	  if [ $scheme = default ]; then scheme=$(cat default); fi
 	  set -o pipefail && xcodebuild -scheme "$scheme" -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
