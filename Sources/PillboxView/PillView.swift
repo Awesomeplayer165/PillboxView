@@ -10,6 +10,8 @@ import Foundation
 
 #if canImport(AppKit)
 import AppKit
+#elseif canImport(UIKit)
+import UIKit
 #endif
 
 // ---
@@ -110,11 +112,11 @@ public class PillView: NSUIView {
     ///
     /// Use the other initializers to set fields/values of the ``PillboxView/PillView``. While you could modify some of the fields/properties with default values, some of them cannot be mutated.
     public init() {
-        super.init(frame: NSRect(origin: NSZeroPoint, size: NSSize(width: Self.defaultWidth, height: Self.defaultHeight)))
+        super.init(frame: CGRect(origin: CGPoint.zero, size: CGSize(width: Self.defaultWidth, height: Self.defaultHeight)))
         self._internalInit()
     }
     
-    public override init(frame frameRect: NSRect) {
+    public override init(frame frameRect: CGRect) {
         super.init(frame: frameRect)
         self._internalInit()
     }
@@ -226,7 +228,7 @@ public class PillView: NSUIView {
             }
             
             imageView.image = state ? self.successSymbol : self.failureSymbol
-            imageView.tintColor(color: state ? NSUIColor.systemGreen  : NSUIColor.systemRed)
+            imageView.tintColor = state ? NSUIColor.systemGreen  : NSUIColor.systemRed
             imageView.isHidden = true
             
             #if os(macOS)
@@ -240,7 +242,7 @@ public class PillView: NSUIView {
             viewAnimation.start()
             #else
             UIView.transition(from: self.activityIndicator, to: imageView, duration: 0.25, options: .transitionCrossDissolve) { _ in
-                self.activityIndicator.isSpinning = false
+                self.activityIndicator.stopAnimating()
                 self.activityIndicator.isHidden = true
                 imageView.isHidden = false
             }
@@ -282,7 +284,7 @@ public class PillView: NSUIView {
         self.showType = .ongoingTask
                 
         // titleLabel which should be centered within the superview
-        self.titleLabel = NSUILabel(frame: NSRect(x: 0,
+        self.titleLabel = NSUILabel(frame: CGRect(x: 0,
                                                   y: 6,
                                                   width: self.frame.width - 40,
                                                   height: 23))
@@ -299,7 +301,7 @@ public class PillView: NSUIView {
         self.centerVertically(subview: self.titleLabel, horizontalAlignment: .leading)
 
         // Setup activityIndicator
-        self.activityIndicator = NSUIActivityIndicatorView(frame: NSRect(x: self.titleLabel.frame.maxX,
+        self.activityIndicator = NSUIActivityIndicatorView(frame: CGRect(x: self.titleLabel.frame.maxX,
                                                            y: 10,
                                                            width: 16,
                                                            height: 16))
@@ -311,13 +313,13 @@ public class PillView: NSUIView {
         self.centerVertically(subview: self.activityIndicator, horizontalAlignment: .trailing)
         
         // Setup completed task imageView
-        let imageView = NSUIImageView(frame: NSRect(x: self.titleLabel.frame.maxX,
+        let imageView = NSUIImageView(frame: CGRect(x: self.titleLabel.frame.maxX,
                                                     y: 10,
                                                     width: 16,
                                                     height: 16))
         
         imageView.isHidden = true
-        imageView.tintColor(color: tintColor)
+        imageView.tintColor = tintColor
         imageView.tag = 2
         self.centerVertically(subview: imageView, horizontalAlignment: .trailing)
             
@@ -339,11 +341,11 @@ public class PillView: NSUIView {
         }
         #else
         NSUIView.animate(withDuration: 1) {
-            self.pillView.frame = UXRect(x: Int(vcView.frame.midX),
-                                         y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
-                                         width: self.width, height: self.height)
+            self.frame = CGRect(x: vcView.frame.midX,
+                                y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
+                                width: self.width, height: self.height)
             
-            self.pillView.center.x = vcView.center.x
+            self.center.x = vcView.center.x
             
             if let completionHandler = completionHandler { completionHandler() }
         }
@@ -390,7 +392,7 @@ public class PillView: NSUIView {
         self.showType = .error
      
         // titleLabel
-        self.titleLabel = NSUILabel(frame: NSRect(x: 0, y: 6, width: self.frame.width - 40, height: 23))
+        self.titleLabel = NSUILabel(frame: CGRect(x: 0, y: 6, width: self.frame.width - 40, height: 23))
         self.titleLabel.text = message
         self.titleLabel.textAlignment = .center
         self.titleLabel.font = self.font
@@ -403,13 +405,13 @@ public class PillView: NSUIView {
         self.titleLabel.tag = 3
 
         // imageView
-        let imageView = NSUIImageView(frame: NSRect(x: titleLabel.frame.maxX,
+        let imageView = NSUIImageView(frame: CGRect(x: titleLabel.frame.maxX,
                                                     y: 6,
                                                     width: (self.frame.width - 15) - titleLabel.frame.maxX,
                                                     height: 23))
 
         imageView.image = errorSymbol
-        imageView.tintColor(color: tintColor!)
+        imageView.tintColor = tintColor!
         imageView.tag = 4
 
         // moving/adding into frame
@@ -434,11 +436,11 @@ public class PillView: NSUIView {
         }
         #else
             UIView.animate(withDuration: 1) {
-                self.pillView.frame = UXRect(x: 100,
-                                             y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
-                                             width: self.width,
-                                             height: self.height)
-                self.pillView.center.x = vcView.center.x
+                self.frame = CGRect(x: 100,
+                                    y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
+                                    width: self.width,
+                                    height: self.height)
+                self.center.x = vcView.center.x
             }
         #endif
                 
@@ -481,19 +483,23 @@ public class PillView: NSUIView {
         self.layer!.borderColor   = NSUIColor.lightGray.cgColor
         self.layer!.borderWidth   = 0.2
 
+        // And add resizing mask so both the left and right side have flexible margins
+        // and pill is horizontally centered into containing view when resizing
+        self.autoresizingMask = [.minXMargin, .maxXMargin]
+
         #else
         let layer = self.layer
-        layer.backgroundColor = NSUIColor.PillboxBackgroundColor
+        layer.backgroundColor = NSUIColor.PillboxBackgroundColor.cgColor
         layer.cornerRadius  = 20
         layer.shadowOpacity = 0.1
         layer.shadowOffset  = .zero
         layer.shadowColor   = NSUIColor.black.cgColor
         layer.shadowRadius  = 10
-        #endif
 
         // And add resizing mask so both the left and right side have flexible margins
         // and pill is horizontally centered into containing view when resizing
-        self.autoresizingMask = [.minXMargin, .maxXMargin]
+        self.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin]
+        #endif
         
         // Add it to the hierarchy and retain parent
         parentView.addSubview(self)
@@ -507,7 +513,7 @@ public class PillView: NSUIView {
         // TODO: This function is not doign anything useful yet...
         let originX = subview.frame.origin.x
         let originY = subview.frame.origin.y
-        subview.frame = NSRect(origin: CGPoint(x: originX, y: originY), size: subview.frame.size)
+        subview.frame = CGRect(origin: CGPoint(x: originX, y: originY), size: subview.frame.size)
     }
 }
 

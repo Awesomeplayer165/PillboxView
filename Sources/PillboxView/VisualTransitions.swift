@@ -6,7 +6,10 @@
 
 #if canImport(AppKit)
 import AppKit
+#elseif canImport(UIKit)
+import UIKit
 #endif
+
 import Foundation
 
 extension PillView {
@@ -41,10 +44,10 @@ extension PillView {
             })
             #else
             UIView.animate(withDuration: 1, delay: 0.25) {
-                self.pillView.frame = CGRect(x: self.pillView.frame.minX,
-                                             y: -300,
-                                             width: self.pillView.frame.width,
-                                             height: self.pillView.frame.height)
+                self.frame = CGRect(x: self.frame.minX,
+                                    y: -300,
+                                    width: self.frame.width,
+                                    height: self.frame.height)
                 
                 if let completionHandler = completionHandler { completionHandler() }
             }
@@ -73,10 +76,10 @@ extension PillView {
                 }
             #else
             UIView.animate(withDuration: 1, delay: 0.25) {
-                self.pillView.frame = CGRect(x: self.pillView.frame.minX,
-                                             y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
-                                             width: self.pillView.frame.width,
-                                             height: self.pillView.frame.height)
+                self.frame = CGRect(x: self.frame.minX,
+                                    y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
+                                    width: self.frame.width,
+                                    height: self.frame.height)
                 
                 if let completionHandler = completionHandler { completionHandler() }
             }

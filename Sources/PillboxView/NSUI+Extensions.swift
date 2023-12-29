@@ -3,6 +3,7 @@
 //  
 //
 
+import CoreGraphics
 import Foundation
 
 // ---
@@ -15,12 +16,12 @@ internal extension NSUIView {
     /// Changing the window size will not recalculate the origin.
     func originForCenter(inRelationTo parentView: NSUIView) -> CGPoint {
         guard
-            parentView.frame != NSZeroRect
+            parentView.frame != CGRect.zero
         else {
             fatalError("Your parentView must have a non-zero size")
         }
         
-        let midPoint = NSMidX(parentView.frame)
+        let midPoint = CGRectGetMidX(parentView.frame)
         
         // Now get the half the width of our view and substract than from the midPoint
         let selfMidPoint = self.frame.width / 2
