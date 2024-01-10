@@ -8,10 +8,10 @@
 import CoreGraphics
 import Foundation
 
-#if canImport(AppKit)
-import AppKit
-#elseif canImport(UIKit)
+#if canImport(UIKit) // Testing for UIKit import first to prevent Mac Catalyst errors...
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
 #endif
 
 // ---
@@ -37,7 +37,7 @@ public class PillView: NSUIView {
     /// The height of the ``PillboxView/PillView/pillView``.
     ///
     /// If a `UINavigationController` obstructs it, then set ``PillboxView/PillView/isNavigationControllerPresent`` to `true`
-    private static let defaultHeight: CGFloat = 200
+    private static let defaultHeight: CGFloat = 40
     public var height: CGFloat {
         return self.frame.height
     }
@@ -99,8 +99,14 @@ public class PillView: NSUIView {
     
     /// The font to be used for displaying ``PillboxView/PillView`` messages on the screen.
     /// By default, the font is nil and defaults to the normal font.
-    public private(set) var font: NSUIFont? = nil
+    public var font: NSUIFont? = nil
     
+    // Constants for subview element positionning
+    private static let rightMarginFromPill = 8.0
+    private static let imageHeight = 16.0
+    private static let imageWidth = 16.0
+    private static let spinnerHeight = 16.0
+    private static let spinnerWidth = 16.0
     /// The `Set` holds unique ``PillboxView/PillView`` shown on the screen at the given time.
     ///
     /// When ``PillboxView/PillView`` exit the screen, they are removed from this `Set`. There are numerous use cases for this:
@@ -178,11 +184,6 @@ public class PillView: NSUIView {
     ///   - height: The height of the ``PillboxView/PillView/pillView``.
     public convenience init(width: Int, height: Int) {
         self.init(frame: CGRect(x: 0, y: 0, width: width, height: height))
-
-        /*
-        self.width  = width
-        self.height = height
-        */
         self.showType = nil
     }
     
@@ -257,7 +258,7 @@ public class PillView: NSUIView {
                 self.removeFromSuperview()
                 self.showType = nil
                 
-                if let completionHandler = completionHandler { completionHandler() }
+                completionHandler?()
                 self.isAwaitingTaskCompletion = false
             }
         }
@@ -283,45 +284,29 @@ public class PillView: NSUIView {
 
         self.showType = .ongoingTask
                 
-        // titleLabel which should be centered within the superview
-        self.titleLabel = NSUILabel(frame: CGRect(x: 0,
-                                                  y: 6,
-                                                  width: self.frame.width - 40,
-                                                  height: 23))
+        // Configure and position label
+        self.titleLabel = self.configureLabel(message: message, tag: 1)
 
-        self.titleLabel.text = message
-        self.titleLabel.textAlignment = .center
-        self.titleLabel.font = self.font
-        #if os(macOS)
-        self.titleLabel.isBordered = false
-        #endif
-        self.titleLabel.textColor = NSUIColor.PillboxTitleColor
-        self.titleLabel.backgroundColor = .clear
-        self.titleLabel.tag = 1
-        self.centerVertically(subview: self.titleLabel, horizontalAlignment: .leading)
-
-        // Setup activityIndicator
-        self.activityIndicator = NSUIActivityIndicatorView(frame: CGRect(x: self.titleLabel.frame.maxX,
-                                                           y: 10,
-                                                           width: 16,
-                                                           height: 16))
+        // Setup activityIndicator. Vertically centered within parent view
+        self.activityIndicator = NSUIActivityIndicatorView(frame: CGRect(x: self.frame.width - Self.spinnerWidth - Self.rightMarginFromPill,
+                                                                         y: (self.frame.height / 2.0) - (Self.spinnerHeight / 2.0),
+                                                                         width: Self.spinnerWidth,
+                                                                         height: Self.spinnerHeight))
         #if os(macOS)
         self.activityIndicator.style = .spinning
         self.activityIndicator.controlSize = .small
         #endif
         self.activityIndicator.startAnimating()
-        self.centerVertically(subview: self.activityIndicator, horizontalAlignment: .trailing)
         
-        // Setup completed task imageView
-        let imageView = NSUIImageView(frame: CGRect(x: self.titleLabel.frame.maxX,
-                                                    y: 10,
-                                                    width: 16,
-                                                    height: 16))
+        // Setup completed task imageView. Vertically centered within parent view
+        let imageView = NSUIImageView(frame: CGRect(x: self.frame.width - Self.imageWidth - Self.rightMarginFromPill,
+                                                    y: (self.frame.height / 2.0) - (Self.imageHeight / 2.0),
+                                                    width: Self.imageWidth,
+                                                    height: Self.imageHeight))
         
         imageView.isHidden = true
         imageView.tintColor = tintColor
         imageView.tag = 2
-        self.centerVertically(subview: imageView, horizontalAlignment: .trailing)
             
         // Inserting into view hierarchy
         self.addSubview(titleLabel)
@@ -347,10 +332,8 @@ public class PillView: NSUIView {
             
             self.center.x = vcView.center.x
             
-            if let completionHandler = completionHandler { completionHandler() }
+            completionHandler?()
         }
-
-//        vcView.addSubview(self.pillView)  /* This is not performed in the configurePill(parentView:) function
         #endif
         
         self.isAwaitingTaskCompletion = true
@@ -364,8 +347,6 @@ public class PillView: NSUIView {
         else {
             return
         }
-            
-        // TODO: This new message should be animated to replace the previous one.
         self.titleLabel.text = message
     }
     
@@ -391,24 +372,14 @@ public class PillView: NSUIView {
         let timeToShowErrorPill = timeToShow < 2 ? 2 : timeToShow
         self.showType = .error
      
-        // titleLabel
-        self.titleLabel = NSUILabel(frame: CGRect(x: 0, y: 6, width: self.frame.width - 40, height: 23))
-        self.titleLabel.text = message
-        self.titleLabel.textAlignment = .center
-        self.titleLabel.font = self.font
-        self.titleLabel.textColor = NSUIColor.PillboxTitleColor
-        self.titleLabel.backgroundColor = .clear
+        // Configure and position label
+        self.titleLabel = self.configureLabel(message: message, tag: 3)
 
-        #if os(macOS)
-        self.titleLabel.isBordered = false
-        #endif
-        self.titleLabel.tag = 3
-
-        // imageView
-        let imageView = NSUIImageView(frame: CGRect(x: titleLabel.frame.maxX,
-                                                    y: 6,
-                                                    width: (self.frame.width - 15) - titleLabel.frame.maxX,
-                                                    height: 23))
+        // Setup imageView. Vertically centered within parent view
+        let imageView = NSUIImageView(frame: CGRect(x: self.frame.width - Self.imageWidth - Self.rightMarginFromPill,
+                                                    y: (self.frame.height / 2.0) - (Self.imageWidth / 2.0),
+                                                    width: Self.imageWidth,
+                                                    height: Self.imageHeight))
 
         imageView.image = errorSymbol
         imageView.tintColor = tintColor!
@@ -429,10 +400,6 @@ public class PillView: NSUIView {
             context.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
 
             self.frame.origin = CGPoint(x: originX, y: originY)
-            // Need to center the pillView within the vcView
-            // Using autolayout constaints
-            //self.pillView.centerXAnchor.constraint(equalTo: vcView.centerXAnchor).isActive = true
-            //self.pillView.center.x = vcView.center.x
         }
         #else
             UIView.animate(withDuration: 1) {
@@ -445,28 +412,35 @@ public class PillView: NSUIView {
         #endif
                 
         DispatchQueue.main.asyncAfter(deadline: .now() + 1 + timeToShowErrorPill) {
-            self.dismiss()
-        }
-        
-        DispatchQueue.main.asyncAfter(deadline: .now() + 5 + timeToShowErrorPill) {
-            imageView.removeFromSuperview()
-            self.titleLabel.removeFromSuperview()
+            self.dismiss(completionHandler: {
+                imageView.removeFromSuperview()
+                self.titleLabel.removeFromSuperview()
 
-            // Fix Issue 25: PillView not removed from view hierarchy
-            self.removeFromSuperview()
+                // Fix Issue 25: PillView not removed from view hierarchy
+                self.removeFromSuperview()
 
-            self.showType = nil
-            if let completionHandler = completionHandler { completionHandler() }
+                self.showType = nil
+                completionHandler?()
+            })
         }
     }
     
     /// Common configuration settings
+    /// This is the PillView layout with it's subviews.
+    /// /----------------------------------------\
+    /// |           <- PillText ->         Image |
+    /// \----------------------------------------/
+    /// So the PillView label is always centered horizontally and vertically within the PillView
+    /// The Image or Spinning animator will always be pinned to the right of the pillView
+    /// If the PillView label message is to large to fit the pillView size, it will spill over..
+    /// If the PillView label message assigned font height is larger than the PillView height, a `fatal` will
+    /// be issued.
     private func configurePill(parentView: NSUIView) {
+        #if os(macOS)
         let originX = self.originForCenter(inRelationTo: parentView).x
         let originY = parentView.frame.height /* Offset above top edge (positive value) */ + 50.0
         self.frame.origin = CGPoint(x: originX, y: originY)
-        
-        #if os(macOS)
+
         // Define our shadow
         let shadow              = NSShadow()
         shadow.shadowColor      = NSUIColor.black.withAlphaComponent(0.2)
@@ -488,6 +462,10 @@ public class PillView: NSUIView {
         self.autoresizingMask = [.minXMargin, .maxXMargin]
 
         #else
+        let originX = self.originForCenter(inRelationTo: parentView).x
+        let originY = 0 - self.frame.height + 5 // Pillview height + 5 pixels above the container
+        self.frame.origin = CGPoint(x: originX, y: originY)
+
         let layer = self.layer
         layer.backgroundColor = NSUIColor.PillboxBackgroundColor.cgColor
         layer.cornerRadius  = 20
@@ -506,14 +484,40 @@ public class PillView: NSUIView {
         self.vcView = parentView
     }
     
-    ///
-    /// Vertically center a subview within the pillView with the specified horizontal alignment
-    ///
-    private func centerVertically(subview: NSUIView, horizontalAlignment: NSRectAlignment) {
-        // TODO: This function is not doign anything useful yet...
-        let originX = subview.frame.origin.x
-        let originY = subview.frame.origin.y
-        subview.frame = CGRect(origin: CGPoint(x: originX, y: originY), size: subview.frame.size)
+    private func configureLabel(message: String, tag: Int) -> NSUILabel {
+        // titleLabel
+        let titleLabel = NSUILabel()
+        titleLabel.text = message
+        titleLabel.textAlignment = .center
+        titleLabel.allowsDefaultTighteningForTruncation = true
+        titleLabel.font = self.font
+        titleLabel.textColor = NSUIColor.PillboxTitleColor
+        titleLabel.backgroundColor = .clear
+
+        // Capture font metrics to properly position it within PillView
+        #if os(macOS)
+        let fontMetrics = self.font?.boundingRectForFont ?? CGRectMake(0, 0, 0, 24)
+        let lineHeight = NSHeight(fontMetrics)
+        titleLabel.isBordered = false
+        #else
+        // Is the default font lineHeight really 24?
+        let lineHeight = self.font?.lineHeight ?? 24.0
+        #endif
+
+        // Check if font is bigger than pillView....
+        guard lineHeight < self.frame.height
+        else {
+            fatalError("You Pill is too small (height) for the font you specified")
+        }
+        
+        // center label vertically within the pillView
+        let middlePillView = self.frame.height / 2.0
+        let middleLineHeight = lineHeight / 2.0
+        let integralRect = CGRectIntegral(CGRect(x: 0, y: middlePillView - middleLineHeight, width: self.frame.width, height: lineHeight))
+        titleLabel.frame = integralRect
+        titleLabel.tag = tag
+
+        return titleLabel
     }
 }
 

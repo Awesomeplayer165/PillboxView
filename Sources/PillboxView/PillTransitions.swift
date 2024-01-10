@@ -1,13 +1,13 @@
 //
-//  File.swift
-//  
+//  PillTransitions.swift
+//
 //
 //  Created by Jacob Trentini on 2/3/22.
 
-#if canImport(AppKit)
-import AppKit
-#elseif canImport(UIKit)
+#if canImport(UIKit)
 import UIKit
+#elseif canImport(AppKit)
+import AppKit
 #endif
 
 import Foundation
@@ -40,17 +40,17 @@ extension PillView {
                 self.frame.origin = CGPoint(x: originX, y: originY)
             },
             completionHandler: {
-                if let completionHandler = completionHandler { completionHandler() }
+                completionHandler?()
             })
             #else
-            UIView.animate(withDuration: 1, delay: 0.25) {
-                self.frame = CGRect(x: self.frame.minX,
-                                    y: -300,
-                                    width: self.frame.width,
-                                    height: self.frame.height)
-                
-                if let completionHandler = completionHandler { completionHandler() }
-            }
+            UIView.animate(withDuration: 1.0,
+                           animations: {
+                                // Only change the position of the origin Y axis to be above the container
+                                self.frame.origin = CGPoint(x: self.frame.origin.x, y: 0 - self.frame.height)
+                            },
+                           completion: { completed in
+                                if completed { completionHandler?() }
+                           })
             #endif
         }
     }
@@ -75,14 +75,17 @@ extension PillView {
                     self.frame.origin = CGPoint(x: originX, y: originY)
                 }
             #else
-            UIView.animate(withDuration: 1, delay: 0.25) {
-                self.frame = CGRect(x: self.frame.minX,
-                                    y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
-                                    width: self.frame.width,
-                                    height: self.frame.height)
-                
-                if let completionHandler = completionHandler { completionHandler() }
-            }
+            UIView.animate(withDuration: 1,
+                            delay: 0.25,
+                            animations: {
+                                self.frame = CGRect(x: self.frame.minX,
+                                                    y: UIDevice.current.hasNotch ? 45: 25 + (self.isNavigationControllerPresent ? 40 : 0),
+                                                    width: self.frame.width,
+                                                    height: self.frame.height)
+                            },
+                            completion: { completed in
+                                if completed { completionHandler?() }
+                            })
             #endif
         }
     }
