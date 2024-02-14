@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - 'README.md'
+      - 'CODE_OF_CONDUCT.md'
+      - 'CONTRIBUTING.md'
+      - 'LICENSE'
+      - 'SECURITY.md'
+      - 'ios.yml'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test
+    runs-on: macOS-latest
+    strategy:
+      matrix:
+        destination:
+          - "platform=macOS"
+          # - "platform=macOS,variant=Mac Catalyst"
+          - "platform=iOS Simulator,name=iPhone 11"
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install XCBeautify
+        run: brew install xcbeautify
+      - name: Show buildable schemes
+        run: xcodebuild -list      
+      - name: Test Each Platform
+        run: set -o pipefail && xcodebuild -scheme PillboxView -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
